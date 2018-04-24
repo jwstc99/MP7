@@ -15,8 +15,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
+
+import java.util.ArrayList;
 
 /**
  * Main Activity class for MP7.
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     /**
      * Array of all available coins.
      */
-    private String[] coins = {};
+    private ArrayList<String> coins = new ArrayList<>();
 
     /**
      * On create method.
@@ -51,8 +55,10 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         startAPICall(requestQueue);
         Log.d(TAG, "Starting API Call");
         Spinner spinner = findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
         // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, coins);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, coins);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
@@ -93,10 +99,10 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         JsonParser parser = new JsonParser();
         JsonArray jsonArray = parser.parse(response).getAsJsonArray();
         data = jsonArray;
-        coins = new String[jsonArray.size()];
-        for (int i = 0; i < coins.length; i++) {
-            coins[i] = jsonArray.get(i).getAsJsonObject().get("name").getAsString();
+        for (JsonElement j : jsonArray) {
+            coins.add(j.getAsJsonObject().get("name").getAsString());
         }
+        Log.d(TAG, coins.toString());
     }
 
     @Override
